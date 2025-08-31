@@ -1,0 +1,81 @@
+version: 2
+
+models:
+  - name: tablon_tickets_completo
+    description: "Tablón completo aplanado con información de líneas, cabeceras y centros de tickets"
+    columns:
+      - name: id_ticket
+        description: "ID del ticket desde líneas"
+      - name: id_linea_ticket
+        description: "ID de la línea del ticket"
+      - name: cod_producto
+        description: "Código del producto"
+      - name: cabecera_id_ticket
+        description: "ID del ticket desde cabecera (debería coincidir)"
+      - name: cod_centro
+        description: "Código del centro desde cabecera"
+      - name: centro_cod_centro
+        description: "Código del centro desde centros (debería coincidir)"
+      - name: nombre_producto
+        description: "Nombre del producto"
+      - name: cantidad
+        description: "Cantidad vendida"
+      - name: precio_unitario
+        description: "Precio unitario del producto"
+      - name: total_linea
+        description: "Total de la línea de ticket"
+      - name: fecha_ticket
+        description: "Fecha del ticket"
+      - name: hora_ticket
+        description: "Hora del ticket"
+      - name: total_cabecera
+        description: "Total del ticket completo"
+      - name: metodo_pago
+        description: "Método de pago utilizado"
+      - name: empleado
+        description: "Código del empleado que atendió"
+      - name: nombre_centro
+        description: "Nombre del centro comercial"
+      - name: ciudad
+        description: "Ciudad del centro"
+      - name: region
+        description: "Región del centro"
+      - name: estado
+        description: "Estado operativo del centro"
+      - name: porcentaje_del_total
+        description: "Porcentaje que representa la línea respecto al total del ticket"
+      - name: ts_linea
+        description: "Timestamp de inserción original de la línea"
+      - name: ts_cabecera
+        description: "Timestamp de inserción original de la cabecera"
+      - name: ts_centro
+        description: "Timestamp de inserción original del centro"
+      - name: ts_consolidacion_linea
+        description: "Timestamp de consolidación en silver de la línea"
+      - name: ts_consolidacion_cabecera
+        description: "Timestamp de consolidación en silver de la cabecera"
+      - name: ts_consolidacion_centro
+        description: "Timestamp de consolidación en silver del centro"
+      - name: ts_gold_creacion
+        description: "Timestamp de creación en gold"
+      - name: integridad_completa
+        description: "Indica si todos los joins fueron exitosos"
+  - name: dimension_centros
+    description: "Dimensión de centros con información en mayúsculas para consistencia"
+    columns:
+      - name: cod_centro
+        description: "Código único del centro comercial (PK)"
+      - name: nombre_centro
+        description: "Nombre del centro comercial"
+      - name: ciudad
+        description: "Ciudad del centro"
+      - name: region
+        description: "Región del centro"
+      - name: estado
+        description: "Estado operativo del centro en MAYÚSCULAS"
+      - name: ts_insert
+        description: "Timestamp de inserción original"
+      - name: ts_consolidacion
+        description: "Timestamp de consolidación en silver"
+      - name: ts_gold_actualizacion
+        description: "Timestamp de actualización en gold"

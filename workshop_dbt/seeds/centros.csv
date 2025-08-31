@@ -1,0 +1,11 @@
+cod_centro|nombre_centro|ciudad|region|estado
+CENT001|Centro Comercial Norte|Madrid|Madrid|Activo
+CENT002|Centro Comercial Sur|Barcelona|Cataluña|Activo
+CENT003|Centro Comercial Este|Valencia|Comunidad Valenciana|Activo
+CENT004|Centro Comercial Oeste|Sevilla|Andalucía|Activo
+CENT005|Centro Comercial Central|Zaragoza|Aragón|Activo
+CENT006|Centro Comercial Costa|Málaga|Andalucía|Activo
+CENT007|Centro Comercial Montaña|Bilbao|País Vasco|Activo
+CENT008|Centro Comercial Valle|Valladolid|Castilla y León|Activo
+CENT009|Centro Comercial Plaza|Alicante|Comunidad Valenciana|Activo
+CENT010|Centro Comercial Parque|Murcia|Región de Murcia|Activo

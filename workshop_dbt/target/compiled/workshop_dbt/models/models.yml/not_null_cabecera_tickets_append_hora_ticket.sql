@@ -1,0 +1,11 @@
+
+    
+    
+
+
+
+select hora_ticket
+from "dev"."silver"."cabecera_tickets_append"
+where hora_ticket is null
+
+

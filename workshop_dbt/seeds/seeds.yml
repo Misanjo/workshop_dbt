@@ -1,0 +1,160 @@
+version: 2
+
+seeds:
+  - name: centros
+    description: "Maestra de centros comerciales con información de ubicación y estado"
+    config:
+      +schema: bronze
+      +column_types:
+        cod_centro: varchar(255)
+        nombre_centro: varchar(255)
+        ciudad: varchar(255)
+        region: varchar(255)
+        estado: varchar(255)
+
+    columns:
+      - name: cod_centro
+        description: "Código único identificador del centro comercial"
+        tests:
+          - unique
+          - not_null
+
+      - name: nombre_centro
+        description: "Nombre completo del centro comercial"
+        tests:
+          - not_null
+
+      - name: ciudad
+        description: "Ciudad donde se ubica el centro comercial"
+        tests:
+          - not_null
+
+      - name: region
+        description: "Región o comunidad autónoma del centro"
+
+      - name: estado
+        description: "Estado operativo del centro comercial"
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Activo', 'Inactivo', 'Mantenimiento']
+
+  - name: cabecera_tickets
+    description: "Cabecera de tickets de venta con información general de la transacción"
+    config:
+      +schema: bronze
+      +column_types:
+        id_ticket: varchar(255)
+        cod_centro: varchar(255)
+        fecha_ticket: varchar(255)
+        hora_ticket: varchar(255)
+        total_ticket: varchar(255)
+        metodo_pago: varchar(255)
+        empleado: varchar(255)
+
+    columns:
+      - name: id_ticket
+        description: "Identificador único del ticket de venta"
+        tests:
+          - unique
+          - not_null
+
+      - name: cod_centro
+        description: "Código del centro comercial donde se generó el ticket"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('centros')
+                field: cod_centro
+                name: fk_cabecera_centro
+
+      - name: fecha_ticket
+        description: "Fecha en que se generó el ticket"
+        tests:
+          - not_null
+
+      - name: hora_ticket
+        description: "Hora en que se generó el ticket"
+        tests:
+          - not_null
+
+      - name: total_ticket
+        description: "Importe total del ticket en euros"
+        tests:
+          - not_null
+
+      - name: metodo_pago
+        description: "Método de pago utilizado en la transacción"
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Tarjeta', 'Efectivo', 'Transferencia', 'Bizum']
+
+      - name: empleado
+        description: "Código identificador del empleado que atendió la venta"
+        tests:
+          - not_null
+
+  - name: lineas_tickets
+    description: "Líneas detalladas de los tickets de venta con productos y cantidades"
+    config:
+      +schema: bronze
+      +column_types:
+        id_ticket: varchar(255)
+        id_linea_ticket: varchar(255)
+        cod_producto: varchar(255)
+        nombre_producto: varchar(255)
+        cantidad: varchar(255)
+        precio_unitario: varchar(255)
+        total_linea: varchar(255)
+
+    columns:
+      - name: id_ticket
+        description: "Identificador del ticket al que pertenece la línea"
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('cabecera_tickets')
+                field: id_ticket
+                name: fk_lineas_cabecera
+
+      - name: id_linea_ticket
+        description: "Identificador único de la línea dentro del ticket"
+        tests:
+          - not_null
+
+      - name: cod_producto
+        description: "Código único del producto vendido"
+        tests:
+          - not_null
+
+      - name: nombre_producto
+        description: "Nombre descriptivo del producto"
+        tests:
+          - not_null
+
+      - name: cantidad
+        description: "Cantidad de unidades vendidas del producto"
+        tests:
+          - not_null
+
+      - name: precio_unitario
+        description: "Precio unitario del producto en euros"
+        tests:
+          - not_null
+
+      - name: total_linea
+        description: "Total de la línea (cantidad * precio_unitario)"
+        tests:
+          - not_null
+
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - id_ticket
+              - id_linea_ticket
+            name: unique_ticket_linea

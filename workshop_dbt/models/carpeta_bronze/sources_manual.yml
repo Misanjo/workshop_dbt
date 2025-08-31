@@ -1,0 +1,155 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: "Capa bronze con datos en su forma más cruda, limpieza básica y conversiones"
+    tables:
+      # TABLAS MANUALES (cargadas externamente)
+      - name: centros_manual
+        description: "Tabla de centros comerciales cargada manualmente"
+        loaded_at_field: ts_insert
+        freshness:
+          warn_after:
+            count: "{{ var('freshness_warn_after').count }}"
+            period: "{{ var('freshness_warn_after').period }}"
+          error_after:
+            count: "{{ var('freshness_error_after').count }}"
+            period: "{{ var('freshness_error_after').period }}"
+        columns:
+          - name: cod_centro
+            description: "Código único identificador del centro comercial"
+            data_type: varchar(255)
+            tests:
+              - unique
+              - not_null
+          - name: nombre_centro
+            description: "Nombre completo del centro comercial"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: ciudad
+            description: "Ciudad donde se ubica el centro comercial"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: region
+            description: "Región o comunidad autónoma del centro"
+            data_type: varchar(255)
+          - name: estado
+            description: "Estado operativo del centro comercial"
+            data_type: varchar(255)
+            tests:
+              - accepted_values:
+                  arguments:
+                    values: ['Activo', 'Inactivo', 'Mantenimiento']
+          - name: ts_insert
+            description: "Timestamp de cuando se insertó el registro"
+            data_type: timestamp
+
+      - name: cabecera_tickets_manual
+        description: "Tabla de cabeceras de tickets cargada manualmente"
+        loaded_at_field: ts_insert
+        freshness:
+          warn_after:
+            count: "{{ var('freshness_warn_after').count }}"
+            period: "{{ var('freshness_warn_after').period }}"
+          error_after:
+            count: "{{ var('freshness_error_after').count }}"
+            period: "{{ var('freshness_error_after').period }}"
+        columns:
+          - name: id_ticket
+            description: "Identificador único del ticket de venta"
+            data_type: varchar(255)
+            tests:
+              - unique
+              - not_null
+          - name: cod_centro
+            description: "Código del centro comercial donde se generó el ticket"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: fecha_ticket
+            description: "Fecha en que se generó el ticket"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: hora_ticket
+            description: "Hora en que se generó el ticket"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: total_ticket
+            description: "Importe total del ticket en euros"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: metodo_pago
+            description: "Método de pago utilizado en la transacción"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: empleado
+            description: "Código identificador del empleado que atendió la venta"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: ts_insert
+            description: "Timestamp de cuando se insertó el registro"
+            data_type: timestamp
+
+      - name: lineas_tickets_manual
+        description: "Tabla de líneas de tickets cargada manualmente"
+        loaded_at_field: ts_insert
+        freshness:
+          warn_after:
+            count: "{{ var('freshness_warn_after').count }}"
+            period: "{{ var('freshness_warn_after').period }}"
+          error_after:
+            count: "{{ var('freshness_error_after').count }}"
+            period: "{{ var('freshness_error_after').period }}"
+        columns:
+          - name: id_ticket
+            description: "Identificador del ticket al que pertenece la línea"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: id_linea_ticket
+            description: "Identificador único de la línea dentro del ticket"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: cod_producto
+            description: "Código único del producto vendido"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: nombre_producto
+            description: "Nombre descriptivo del producto"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: cantidad
+            description: "Cantidad de unidades vendidas del producto"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: precio_unitario
+            description: "Precio unitario del producto en euros"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: total_linea
+            description: "Total de la línea (cantidad * precio_unitario)"
+            data_type: varchar(255)
+            tests:
+              - not_null
+          - name: ts_insert
+            description: "Timestamp de cuando se insertó el registro"
+            data_type: timestamp
+        tests:
+          - dbt_utils.unique_combination_of_columns:
+              name: utils_unique_lineas_tickets_manual_ticket_linea_combination
+              arguments:
+                combination_of_columns:
+                  - id_ticket
+                  - id_linea_ticket

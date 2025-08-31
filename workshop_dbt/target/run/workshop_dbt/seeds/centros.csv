@@ -1,0 +1,11 @@
+
+    
+    
+    truncate table "dev"."bronze"."centros";
+    -- dbt seed --
+    
+          COPY "dev"."bronze"."centros" FROM 'c:\GIT\dbt\workshop_dbt\seeds\centros.csv' (FORMAT CSV, HEADER TRUE, DELIMITER '|')
+        
+
+;
+  

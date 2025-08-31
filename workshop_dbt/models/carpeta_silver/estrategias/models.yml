@@ -1,0 +1,405 @@
+version: 2
+
+models:
+  - name: cabecera_tickets_append
+    description: "Transformación silver de cabeceras de tickets desde tabla append de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador único del ticket de venta"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: cod_centro
+        description: "Código del centro comercial donde se generó el ticket"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: fecha_ticket
+        description: "Fecha en que se generó el ticket"
+        data_type: date
+        tests:
+          - not_null
+      - name: hora_ticket
+        description: "Hora en que se generó el ticket"
+        data_type: time
+        tests:
+          - not_null
+      - name: total_ticket
+        description: "Importe total del ticket en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: metodo_pago
+        description: "Método de pago utilizado en la transacción"
+        data_type: varchar(20)
+        tests:
+          - not_null
+      - name: empleado
+        description: "Código identificador del empleado que atendió la venta"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: centros_append
+    description: "Transformación silver de centros comerciales desde tabla append de bronze"
+    columns:
+      - name: cod_centro
+        description: "Código único identificador del centro comercial"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: nombre_centro
+        description: "Nombre completo del centro comercial"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: ciudad
+        description: "Ciudad donde se ubica el centro comercial"
+        data_type: varchar(50)
+        tests:
+          - not_null
+      - name: region
+        description: "Región o comunidad autónoma del centro"
+        data_type: varchar(50)
+      - name: estado
+        description: "Estado operativo del centro comercial"
+        data_type: varchar(20)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Activo', 'Inactivo', 'Mantenimiento']
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: lineas_tickets_append
+    description: "Transformación silver de líneas de tickets desde tabla append de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador del ticket al que pertenece la línea"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: id_linea_ticket
+        description: "Identificador único de la línea dentro del ticket"
+        data_type: integer
+        tests:
+          - not_null
+      - name: cod_producto
+        description: "Código único del producto vendido"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: nombre_producto
+        description: "Nombre descriptivo del producto"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: cantidad
+        description: "Cantidad de unidades vendidas del producto"
+        data_type: integer
+        tests:
+          - not_null
+      - name: precio_unitario
+        description: "Precio unitario del producto en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: total_linea
+        description: "Total de la línea (cantidad * precio_unitario)"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          name: utils_unique_lineas_tickets_append_ticket_linea_combination
+          arguments:
+            combination_of_columns:
+              - id_ticket
+              - id_linea_ticket
+
+  - name: cabecera_tickets_merge
+    description: "Transformación silver de cabeceras de tickets desde tabla merge de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador único del ticket de venta (merge key)"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: cod_centro
+        description: "Código del centro comercial donde se generó el ticket"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: fecha_ticket
+        description: "Fecha en que se generó el ticket"
+        data_type: date
+        tests:
+          - not_null
+      - name: hora_ticket
+        description: "Hora en que se generó the ticket"
+        data_type: time
+        tests:
+          - not_null
+      - name: total_ticket
+        description: "Importe total del ticket en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: metodo_pago
+        description: "Método de pago utilizado en la transacción"
+        data_type: varchar(20)
+        tests:
+          - not_null
+      - name: empleado
+        description: "Código identificador del empleado que atendió la venta"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: centros_merge
+    description: "Transformación silver de centros comerciales desde tabla merge de bronze"
+    columns:
+      - name: cod_centro
+        description: "Código único identificador del centro comercial (merge key)"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: nombre_centro
+        description: "Nombre completo del centro comercial"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: ciudad
+        description: "Ciudad donde se ubica el centro comercial"
+        data_type: varchar(50)
+        tests:
+          - not_null
+      - name: region
+        description: "Región o comunidad autónoma del centro"
+        data_type: varchar(50)
+      - name: estado
+        description: "Estado operativo del centro comercial"
+        data_type: varchar(20)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Activo', 'Inactivo', 'Mantenimiento']
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: lineas_tickets_merge
+    description: "Transformación silver de líneas de tickets desde tabla merge de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador del ticket al que pertenece la línea (merge key)"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: id_linea_ticket
+        description: "Identificador único de la línea dentro del ticket (merge key)"
+        data_type: integer
+        tests:
+          - not_null
+      - name: cod_producto
+        description: "Código único del producto vendido"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: nombre_producto
+        description: "Nombre descriptivo del producto"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: cantidad
+        description: "Cantidad de unidades vendidas del producto"
+        data_type: integer
+        tests:
+          - not_null
+      - name: precio_unitario
+        description: "Precio unitario del producto en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: total_linea
+        description: "Total de la línea (cantidad * precio_unitario)"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          name: utils_unique_lineas_tickets_merge_ticket_linea_combination
+          arguments:
+            combination_of_columns:
+              - id_ticket
+              - id_linea_ticket
+
+  - name: cabecera_tickets_trunc
+    description: "Transformación silver de cabeceras de tickets desde tabla truncate de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador único del ticket de venta"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: cod_centro
+        description: "Código del centro comercial donde se generó el ticket"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: fecha_ticket
+        description: "Fecha en que se generó el ticket"
+        data_type: date
+        tests:
+          - not_null
+      - name: hora_ticket
+        description: "Hora en que se generó el ticket"
+        data_type: time
+        tests:
+          - not_null
+      - name: total_ticket
+        description: "Importe total del ticket en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: metodo_pago
+        description: "Método de pago utilizado en la transacción"
+        data_type: varchar(20)
+        tests:
+          - not_null
+      - name: empleado
+        description: "Código identificador del empleado que atendió la venta"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: centros_trunc
+    description: "Transformación silver de centros comerciales desde tabla truncate de bronze"
+    columns:
+      - name: cod_centro
+        description: "Código único identificador del centro comercial"
+        data_type: varchar(10)
+        tests:
+          - unique
+          - not_null
+      - name: nombre_centro
+        description: "Nombre completo del centro comercial"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: ciudad
+        description: "Ciudad donde se ubica el centro comercial"
+        data_type: varchar(50)
+        tests:
+          - not_null
+          - singular_validar_mayusculas
+      - name: region
+        description: "Región o comunidad autónoma del centro"
+        data_type: varchar(50)
+      - name: estado
+        description: "Estado operativo del centro comercial"
+        data_type: varchar(20)
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Activo', 'Inactivo', 'Mantenimiento']
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+
+  - name: lineas_tickets_trunc
+    description: "Transformación silver de líneas de tickets desde tabla truncate de bronze"
+    columns:
+      - name: id_ticket
+        description: "Identificador del ticket al que pertenece la línea"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: id_linea_ticket
+        description: "Identificador único de la línea dentro del ticket"
+        data_type: integer
+        tests:
+          - not_null
+      - name: cod_producto
+        description: "Código único del producto vendido"
+        data_type: varchar(10)
+        tests:
+          - not_null
+      - name: nombre_producto
+        description: "Nombre descriptivo del producto"
+        data_type: varchar(100)
+        tests:
+          - not_null
+      - name: cantidad
+        description: "Cantidad de unidades vendidas del producto"
+        data_type: integer
+        tests:
+          - not_null
+      - name: precio_unitario
+        description: "Precio unitario del producto en euros"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: total_linea
+        description: "Total de la línea (cantidad * precio_unitario)"
+        data_type: decimal(10,2)
+        tests:
+          - not_null
+      - name: ts_insert
+        description: "Timestamp de cuando se insertó el registro en bronze"
+        data_type: timestamp
+      - name: ts_transformacion
+        description: "Timestamp de cuando se transformó a silver"
+        data_type: timestamp
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          name: utils_unique_lineas_tickets_merge_ticket_linea_combination
+          arguments:
+            combination_of_columns:
+              - id_ticket
+              - id_linea_ticket

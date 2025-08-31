@@ -1,0 +1,75 @@
+# Name your project! Project names should contain only lowercase characters
+# and underscores. A good package name should reflect your organization's
+# name or the intended use of these models
+name: 'workshop_dbt'
+version: '1.0.0'
+
+# This setting configures which "profile" dbt uses for this project.
+profile: 'profile_workshop_dbt'
+
+# These configurations specify where dbt should look for different types of files.
+# The `model-paths` config, for example, states that models in this project can be
+# found in the "models/" directory. You probably won't need to change these!
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by `dbt clean`
+  - "target"
+  - "dbt_packages"
+
+
+# Configuring models
+# Full documentation: https://docs.getdbt.com/docs/configuring-models
+
+# In this example config, we tell dbt to build all models in the example/
+# directory as views. These settings can be overridden in the individual model
+# files using the `{{ config(...) }}` macro.
+models:
+  workshop_dbt:  # This should match your project name
+    # Config indicated by + and applies to all files under models/example/
+    carpeta_silver:
+      +schema: silver
+      +tags: ['tag_silver']
+      consolidados:
+        +materialized: incremental
+        +tags: ['tag_consolidados']
+      estrategias:
+        +tags: ['tag_estrategias']
+        append:
+          +materialized: incremental
+          +tags: ['tag_bronze_append']
+        merge:
+          +materialized: incremental
+          +tags: ['tag_bronze_merge']
+        truncate:
+          +materialized: table
+          +tags: ['tag_bronze_truncate']
+    carpeta_gold:
+      +schema: gold
+      +tags: ['tag_gold']
+
+seeds:
+  +tags: ['tag_seed']
+  +schema: bronze
+  +delimiter: "|"
+
+vars:
+  freshness_warn_after:
+    count: 1
+    period: hour
+  freshness_error_after:
+    count: 1
+    period: hour
+
+on-run-start:
+  - "{{ log('Iniciando ejecución de dbt', info=true) }}"
+  - "{{ create_audit_table_if_not_exists() }}"
+  - "{{ log_audit_start() }}"
+
+on-run-end:
+  - "{{ log('Finalizando ejecución de dbt', info=true) }}"
+  - "{{ log_audit_end() }}"
