@@ -1,0 +1,36 @@
+# dbt
+target/
+dbt_packages/
+logs/
+
+# DBs & Binaries
+*.db
+*.duckdb
+*.exe
+*.zip
+*.tar.gz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+.env
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+analysis/
+profile/
